@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>전국 도시공원 탐색기</title>
-  <!-- OpenStreetMap 지도 (API 키 및 도메인 승인 필요 없이 바로 작동) -->
+  <!-- Leaflet 지도 라이브러리 -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -73,7 +73,7 @@
     }
     .btn:hover { background-color: #2563eb; }
 
-    /* 지도 영역 */
+    /* 지도 영역 - Leaflet 렌더링 정상화 필수 스타일 설정 */
     #map {
       width: 100%;
       height: 380px;
@@ -81,6 +81,7 @@
       margin-bottom: 28px;
       border: 1px solid #cbd5e1;
       z-index: 1;
+      background-color: #e5e7eb;
     }
 
     /* 카드북 그리드 레이아웃 */
@@ -166,19 +167,21 @@
   };
 
   function initMap() {
-    // 서울 중심 좌표로 지도 기본 로드
     map = L.map('map').setView([37.5665, 126.9780], 11);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap'
     }).addTo(map);
+
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 300);
   }
 
   async function fetchParkData() {
     showStatus("공공데이터 API에서 공원 정보를 로딩 중입니다...");
     
-    // 서울시 주요 공원 현황 공공데이터 OpenAPI
     const url = `https://openAPI.seoul.go.kr:8088/4f61704b616461793836796472477a/json/SearchParkInfoService/1/50/`;
 
     try {
@@ -186,94 +189,4 @@
       const data = await response.json();
       allParkData = data.SearchParkInfoService?.row || [];
 
-      if (allParkData.length > 0) {
-        renderParks(allParkData);
-        showStatus(`총 ${allParkData.length}개의 공원 정보를 가져왔습니다.`);
-      } else {
-        showStatus("데이터를 불러올 수 없습니다.");
-      }
-    } catch (e) {
-      console.error(e);
-      showStatus("데이터를 불러오는 중 에러가 발생했습니다.");
-    }
-  }
-
-  function renderParks(items) {
-    const grid = document.getElementById('cardGrid');
-    grid.innerHTML = '';
-
-    // 기존 지도 마커 초기화
-    markers.forEach(m => map.removeLayer(m));
-    markers = [];
-
-    let hasValidCoords = false;
-
-    items.forEach((item, idx) => {
-      const parkName = item.P_PARK || '도시공원';
-      const parkCategory = item.P_ZONE || '도시공원';
-      const parkAddress = item.P_ADDR || '주소 정보 없음';
-      const lat = parseFloat(item.LATitude || item.LAT);
-      const lng = parseFloat(item.LONGitude || item.LNG);
-
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <span class="card-tag">${parkCategory}</span>
-        <h3 class="card-title">${parkName}</h3>
-        <p class="card-addr">📍 ${parkAddress}</p>
-      `;
-
-      card.onclick = () => {
-        const parkDataToSave = {
-          parkNm: parkName,
-          parkSe: parkCategory,
-          lnmadr: parkAddress,
-          mvtFclty: item.USE_REFER || '체육/운동시설 정보 없음',
-          cnvncFclty: item.P_LIST_NUM || '편의시설 정보 없음',
-          mngInstNm: item.P_ADMINTEL || '관리기관 연락처 정보 없음'
-        };
-        localStorage.setItem('selectedPark', JSON.stringify(parkDataToSave));
-        window.location.href = 'detail.html';
-      };
-
-      grid.appendChild(card);
-
-      // 지도 상 마커 띄우기
-      if (!isNaN(lat) && !isNaN(lng)) {
-        const marker = L.marker([lat, lng]).addTo(map)
-          .bindPopup(`<b>${parkName}</b><br>${parkAddress}`);
-        markers.push(marker);
-
-        if (!hasValidCoords) {
-          map.setView([lat, lng], 12);
-          hasValidCoords = true;
-        }
-      }
-    });
-  }
-
-  function searchPark() {
-    const keyword = document.getElementById('searchInput').value.trim();
-    if (!keyword) {
-      renderParks(allParkData);
-      showStatus(`총 ${allParkData.length}개의 공원 정보를 표시합니다.`);
-      return;
-    }
-
-    const filtered = allParkData.filter(p => 
-      (p.P_PARK && p.P_PARK.includes(keyword)) || 
-      (p.P_ADDR && p.P_ADDR.includes(keyword))
-    );
-
-    if (filtered.length > 0) {
-      renderParks(filtered);
-      showStatus(`'${keyword}' 검색 결과: 총 ${filtered.length}개의 공원을 찾았습니다.`);
-    } else {
-      document.getElementById('cardGrid').innerHTML = '';
-      showStatus(`'${keyword}'에 대한 검색 결과가 없습니다.`);
-    }
-  }
-</script>
-
-</body>
-</html>
+      if (allParkData.length > 0)
