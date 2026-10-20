@@ -1,255 +1,472 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>전국 공원 & 관광지 탐색기</title>
+  <title>TRAVEL LOG | 전국 여행지 탐색</title>
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    * { box-sizing: border-box; }
+    :root {
+      --navy: #172D4D;
+      --blue: #365F91;
+      --bg: #F4F6FA;
+      --text: #202C3D;
+      --muted: #748094;
+      --line: #E3E8F0;
     }
     body {
-      background-color: #f4f6f9;
       margin: 0;
-      padding: 40px 20px;
-      display: flex;
-      justify-content: center;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+        "Noto Sans KR", Arial, sans-serif;
     }
-    .container {
-      width: 100%;
-      max-width: 1000px;
-      background: #ffffff;
-      border-radius: 20px;
-      padding: 36px 32px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-    }
-    h1 {
-      text-align: center;
-      color: #1e293b;
-      margin-top: 0;
-      margin-bottom: 8px;
-    }
-    .subtitle {
-      text-align: center;
-      color: #64748b;
-      font-size: 14px;
-      margin-bottom: 24px;
-    }
-
-    /* 검색 UI */
-    .search-wrapper {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-    input[type="text"] {
-      flex: 1;
-      max-width: 400px;
-      padding: 12px 16px;
-      font-size: 15px;
-      border: 2px solid #cbd5e1;
-      border-radius: 12px;
-      outline: none;
-    }
-    input[type="text"]:focus {
-      border-color: #3b82f6;
-    }
-    .btn {
-      padding: 12px 20px;
-      font-size: 15px;
-      border-radius: 12px;
-      border: none;
-      background-color: #3b82f6;
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .topbar {
+      background: var(--navy);
       color: white;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
+      padding: 19px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
     }
-    .btn:hover { background-color: #2563eb; }
-
-    /* 카드북 그리드 레이아웃 */
+    .brand { font-size: 21px; font-weight: 800; letter-spacing: 1px; }
+    .brand small {
+      display: block; margin-top: 4px; font-size: 11px;
+      font-weight: 400; letter-spacing: 2px; color: #C5D2E5;
+    }
+    .nav-btn {
+      color: white; border: 1px solid #71839C; background: transparent;
+      padding: 10px 15px; border-radius: 9px;
+    }
+    main { max-width: 1180px; margin: auto; padding: 35px 22px 60px; }
+    .hero {
+      background: linear-gradient(120deg, #172D4D, #355D89);
+      color: white; border-radius: 20px; padding: 35px;
+      margin-bottom: 25px;
+    }
+    .eyebrow { font-size: 12px; letter-spacing: 2px; color: #C6D7EE; }
+    h1 { margin: 12px 0; font-size: clamp(26px, 4vw, 38px); }
+    .hero p { color: #E0E8F3; line-height: 1.7; margin-bottom: 0; }
+    .search-panel {
+      background: white; border: 1px solid var(--line);
+      padding: 20px; border-radius: 16px; margin-bottom: 24px;
+    }
+    .search-row {
+      display: grid; grid-template-columns: 170px 1fr auto;
+      gap: 10px;
+    }
+    input, select {
+      min-width: 0; width: 100%; padding: 13px 14px;
+      border: 1px solid #D5DDE8; border-radius: 10px;
+      background: white; color: var(--text); outline: none;
+    }
+    input:focus, select:focus { border-color: var(--blue); }
+    .primary, .secondary {
+      border: 0; border-radius: 10px; padding: 13px 18px;
+      font-weight: 700;
+    }
+    .primary { background: var(--navy); color: white; }
+    .secondary { background: #EAF0F8; color: var(--navy); }
+    .section-head {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 12px; margin: 28px 0 16px;
+    }
+    .section-head h2 { font-size: 21px; margin: 0; }
+    .muted { color: var(--muted); font-size: 13px; }
     .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 24px;
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
     }
     .card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
+      min-width: 0; background: white; border: 1px solid var(--line);
+      border-radius: 15px; overflow: hidden; display: flex;
+      flex-direction: column; transition: transform .18s, box-shadow .18s;
     }
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
+    .card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px #172D4D12; }
+    .image-wrap { height: 205px; background: #E9EDF3; position: relative; }
+    .card-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .no-photo {
+      height: 100%; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 8px;
+      color: #7A8799; font-size: 13px; text-align: center; padding: 15px;
     }
-    
-    .card-img {
-      width: 100%;
-      height: 190px;
-      object-fit: cover;
-      background-color: #e2e8f0;
+    .favorite {
+      position: absolute; right: 12px; top: 12px; z-index: 1;
+      border: 0; border-radius: 50%; width: 38px; height: 38px;
+      background: white; color: #536176; font-size: 21px;
+      box-shadow: 0 2px 8px #0002;
     }
-
-    .card-body {
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      flex-grow: 1;
+    .favorite.active { color: #C44E5C; }
+    .card-body { padding: 17px; display: flex; flex-direction: column; flex: 1; }
+    .tag {
+      display: inline-block; width: fit-content; padding: 5px 8px;
+      border-radius: 6px; background: #EAF0F8; color: #36577F;
+      font-size: 11px; margin-bottom: 10px;
     }
-    .card-tag {
-      align-self: flex-start;
-      background-color: #e0f2fe;
-      color: #0369a1;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 6px;
-      margin-bottom: 8px;
+    .card h3 { font-size: 17px; line-height: 1.5; margin: 0 0 8px; }
+    .address {
+      font-size: 13px; color: var(--muted); line-height: 1.6;
+      margin: 0 0 18px; flex: 1; overflow-wrap: anywhere;
     }
-    .card-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #1e293b;
-      margin: 0 0 8px 0;
-      line-height: 1.3;
+    .detail-btn {
+      display: block; width: 100%; text-align: center; padding: 11px;
+      background: #F3F6FA; border-radius: 9px; border: 0;
+      color: var(--navy); font-weight: 700;
     }
-    .card-addr {
-      font-size: 13px;
-      color: #64748b;
-      margin: 0 0 14px 0;
-      line-height: 1.4;
+    .detail-btn:hover { background: #E5ECF5; }
+    .status {
+      text-align: center; padding: 45px 15px; color: var(--muted);
+      background: white; border: 1px dashed #D5DDE8;
+      border-radius: 14px; line-height: 1.8;
     }
-    .map-link {
-      margin-top: auto;
-      font-size: 13px;
-      color: #2563eb;
-      font-weight: 600;
-      text-decoration: none;
+    .status strong { display: block; color: var(--text); margin-bottom: 5px; }
+    .hidden { display: none !important; }
+    .pagination {
+      display: flex; justify-content: center; gap: 10px; margin-top: 25px;
     }
-    .map-link:hover { text-decoration: underline; }
-
-    .status-msg {
-      text-align: center;
-      font-size: 14px;
-      color: #3b82f6;
-      margin-bottom: 20px;
-      font-weight: 600;
+    footer { text-align: center; padding: 24px; color: var(--muted); font-size: 12px; }
+    @media (max-width: 800px) {
+      .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .search-row { grid-template-columns: 1fr 1fr; }
+      .search-row input { grid-column: 1 / -1; }
+    }
+    @media (max-width: 520px) {
+      main { padding: 22px 14px 40px; }
+      .hero { padding: 25px 20px; }
+      .card-grid { grid-template-columns: 1fr; }
+      .search-row { grid-template-columns: 1fr; }
+      .search-row input { grid-column: auto; }
+      .image-wrap { height: 220px; }
     }
   </style>
 </head>
 <body>
+  <header class="topbar">
+    <div class="brand">TRAVEL LOG<small>DISCOVER YOUR NEXT JOURNEY</small></div>
+    <button class="nav-btn" onclick="showFavorites()">♥ 내 즐겨찾기</button>
+  </header>
 
-<div class="container">
-  <h1>🌳 전국 공원 & 명소 카드북</h1>
-  <div class="subtitle">전국의 주요 공원과 추천 명소 위치 및 상세 정보를 검색합니다.</div>
+  <main>
+    <section class="hero">
+      <div class="eyebrow">KOREA TRAVEL GUIDE</div>
+      <h1>다음 여행지를 발견해 보세요.</h1>
+      <p>지역별 관광지를 탐색하고 마음에 드는 장소를 저장해 보세요.</p>
+    </section>
 
-  <div class="search-wrapper">
-    <input type="text" id="searchInput" placeholder="검색어 입력 (예: 공원, 서울, 한강, 제주)" onkeyup="if(event.keyCode===13) searchPark()">
-    <button class="btn" onclick="searchPark()">검색</button>
-  </div>
+    <section class="search-panel">
+      <div class="search-row">
+        <select id="areaSelect" aria-label="지역 선택">
+          <option value="">전국</option>
+          <option value="1">서울</option>
+          <option value="2">인천</option>
+          <option value="3">대전</option>
+          <option value="4">대구</option>
+          <option value="5">광주</option>
+          <option value="6">부산</option>
+          <option value="7">울산</option>
+          <option value="8">세종</option>
+          <option value="31">경기도</option>
+          <option value="32">강원도</option>
+          <option value="33">충청북도</option>
+          <option value="34">충청남도</option>
+          <option value="35">경상북도</option>
+          <option value="36">경상남도</option>
+          <option value="37">전라북도</option>
+          <option value="38">전라남도</option>
+          <option value="39">제주도</option>
+        </select>
+        <input id="keywordInput" type="search" placeholder="어디로 떠나고 싶나요? 예: 바다, 경복궁">
+        <button class="primary" id="searchBtn" onclick="searchPlaces()">검색하기</button>
+      </div>
+    </section>
 
-  <div class="status-msg" id="statusMsg"></div>
+    <div class="section-head">
+      <h2 id="listTitle">추천 여행지</h2>
+      <span class="muted" id="resultCount"></span>
+    </div>
 
-  <!-- 카드 리스트 -->
-  <div id="cardGrid" class="card-grid"></div>
-</div>
+    <div id="status" class="status">
+      <strong>여행지를 불러올 준비가 되었어요.</strong>
+      지역을 선택하거나 검색어를 입력해 보세요.
+    </div>
+    <div id="cardGrid" class="card-grid hidden"></div>
 
-<script>
-  const API_KEY = "08255e4a7faa9ff0a64db77d7c15f7b661f78ade570c59806690af625c023496";
-  const defaultImg = "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?w=600&q=80";
+    <div class="pagination">
+      <button class="secondary hidden" id="moreBtn" onclick="loadMore()">더 많은 여행지 보기</button>
+    </div>
+  </main>
 
-  let allItems = [];
+  <footer>TRAVEL LOG · 한국관광공사 관광정보 활용</footer>
 
-  window.onload = function() {
-    fetchData('');
-  };
+  <script>
+    // 기존에 사용하던 공공데이터포털 인증키를 따옴표 안에 입력하세요.
+    // 기존 코드에서 정상 작동했던 키를 그대로 사용하면 됩니다.
+    const TOUR_API_KEY = "여기에_기존_인증키_입력";
 
-  async function fetchData(keyword) {
-    showStatus("데이터를 불러오는 중입니다...");
-    
-    let url = `https://apis.data.go.kr/B551011/KorService1/areaBasedList1?serviceKey=${API_KEY}&numOfRows=30&pageNo=1&MobileOS=ETC&MobileApp=AppTest&_type=json&arrange=O`;
-    if (keyword) {
-      url = `https://apis.data.go.kr/B551011/KorService1/searchKeyword1?serviceKey=${API_KEY}&numOfRows=30&pageNo=1&MobileOS=ETC&MobileApp=AppTest&_type=json&keyword=${encodeURIComponent(keyword)}`;
+    const API_BASE = "https://apis.data.go.kr/B551011/KorService2";
+    const APP_NAME = "TravelLog";
+    const PAGE_SIZE = 12;
+
+    let currentPage = 1;
+    let currentMode = "area";
+    let currentKeyword = "";
+    let currentArea = "";
+    let isLoading = false;
+    let allItems = [];
+
+    const $ = id => document.getElementById(id);
+
+    function setStatus(title, message = "") {
+      $("status").classList.remove("hidden");
+      $("status").innerHTML = "";
+      const strong = document.createElement("strong");
+      strong.textContent = title;
+      $("status").appendChild(strong);
+      if (message) $("status").appendChild(document.createTextNode(message));
+      $("cardGrid").classList.add("hidden");
+      $("moreBtn").classList.add("hidden");
     }
 
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      allItems = data.response?.body?.items?.item || [];
-
-      if (!Array.isArray(allItems) && typeof allItems === 'object') {
-        allItems = [allItems];
-      }
-
-      if (allItems.length > 0) {
-        renderCards(allItems);
-        showStatus(`총 ${allItems.length}개의 추천 정보를 불러왔습니다.`);
-      } else {
-        document.getElementById('cardGrid').innerHTML = '';
-        showStatus("검색 결과가 없습니다. 다른 검색어로 시도해 보세요.");
-      }
-    } catch (e) {
-      console.error(e);
-      showStatus("데이터 로딩 중 에러가 발생했습니다.");
+    function normalizeItems(data) {
+      const result = data?.response?.body?.items?.item;
+      if (!result) return [];
+      return Array.isArray(result) ? result : [result];
     }
-  }
 
-  function renderCards(items) {
-    const grid = document.getElementById('cardGrid');
-    grid.innerHTML = '';
+    async function apiRequest(endpoint, params) {
+      if (!TOUR_API_KEY || TOUR_API_KEY.includes("여기에_")) {
+        throw new Error("index.html에서 공공데이터포털 인증키를 입력해 주세요.");
+      }
 
-    items.forEach((item) => {
-      const title = item.title || '명소 정보';
-      const address = item.addr1 || item.addr2 || '주소 정보 없음';
-      const photo = item.firstimage ? item.firstimage : (item.firstimage2 ? item.firstimage2 : defaultImg);
-      const mapUrl = `https://map.kakao.com/?q=${encodeURIComponent(address || title)}`;
-
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <img src="${photo}" class="card-img" alt="${title}" onerror="this.onerror=null; this.src='${defaultImg}';">
-        <div class="card-body">
-          <span class="card-tag">추천 명소</span>
-          <h3 class="card-title">${title}</h3>
-          <p class="card-addr">📍 ${address}</p>
-          <a href="${mapUrl}" target="_blank" class="map-link" onclick="event.stopPropagation();">🗺️ 카카오맵 위치 보기 ↗</a>
-        </div>
-      `;
-
-      card.onclick = () => {
-        const detailData = {
-          title: title,
-          address: address,
-          photo: photo,
-          tel: item.tel || '연락처 정보 없음',
-          zipcode: item.zipcode || '우편번호 정보 없음',
-          contentid: item.contentid
-        };
-        localStorage.setItem('selectedPark', JSON.stringify(detailData));
-        window.location.href = 'detail.html';
+      const url = new URL(`${API_BASE}/${endpoint}`);
+      const common = {
+        serviceKey: TOUR_API_KEY,
+        numOfRows: String(PAGE_SIZE),
+        pageNo: String(currentPage),
+        MobileOS: "ETC",
+        MobileApp: APP_NAME,
+        _type: "json",
+        ...params
       };
 
-      grid.appendChild(card);
+      Object.entries(common).forEach(([key, value]) => {
+        if (value !== "" && value != null) url.searchParams.set(key, value);
+      });
+
+      const response = await fetch(url.toString());
+      if (!response.ok) throw new Error(`API HTTP 오류 (${response.status})`);
+
+      const data = await response.json();
+      if (data?.response?.header?.resultCode &&
+          data.response.header.resultCode !== "0000") {
+        throw new Error(data.response.header.resultMsg || "관광정보 API 오류");
+      }
+      return data;
+    }
+
+    async function searchPlaces(reset = true) {
+      if (isLoading) return;
+      if (reset) {
+        currentPage = 1;
+        allItems = [];
+      }
+
+      currentKeyword = $("keywordInput").value.trim();
+      currentArea = $("areaSelect").value;
+      currentMode = currentKeyword ? "keyword" : "area";
+
+      if (reset) setStatus("관광 정보를 불러오는 중입니다.", "잠시만 기다려 주세요.");
+      isLoading = true;
+      $("searchBtn").disabled = true;
+      $("searchBtn").textContent = "검색 중...";
+
+      try {
+        const params = currentMode === "keyword"
+          ? { keyword: currentKeyword, ...(currentArea ? { areaCode: currentArea } : {}) }
+          : { ...(currentArea ? { areaCode: currentArea } : {}), arrange: "Q" };
+
+        const data = await apiRequest(
+          currentMode === "keyword" ? "searchKeyword2" : "areaBasedList2",
+          params
+        );
+
+        const items = normalizeItems(data);
+        allItems = reset ? items : allItems.concat(items);
+        renderCards(items, !reset);
+
+        if (reset) {
+          $("listTitle").textContent = currentKeyword
+            ? `"${currentKeyword}" 검색 결과`
+            : currentArea
+              ? `${$("areaSelect").selectedOptions[0].text} 여행지`
+              : "전국 여행지";
+        }
+        const total = Number(data?.response?.body?.totalCount || allItems.length);
+        $("resultCount").textContent = `조회 결과 ${total.toLocaleString()}개`;
+        $("moreBtn").classList.toggle("hidden", allItems.length >= total || items.length === 0);
+      } catch (error) {
+        console.error(error);
+        setStatus("관광 정보를 불러오지 못했어요.", error.message);
+      } finally {
+        isLoading = false;
+        $("searchBtn").disabled = false;
+        $("searchBtn").textContent = "검색하기";
+      }
+    }
+
+    function safeImageUrl(value) {
+      if (!value) return "";
+      try {
+        const url = new URL(value);
+        if (url.protocol === "http:") url.protocol = "https:";
+        if (!["https:"].includes(url.protocol)) return "";
+        return url.href;
+      } catch {
+        return "";
+      }
+    }
+
+    function getFavorites() {
+      try {
+        return JSON.parse(localStorage.getItem("travelFavorites") || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function isFavorite(item) {
+      return getFavorites().some(f => String(f.contentid) === String(item.contentid));
+    }
+
+    function toggleFavorite(item) {
+      const favorites = getFavorites();
+      const exists = favorites.some(f => String(f.contentid) === String(item.contentid));
+      const updated = exists
+        ? favorites.filter(f => String(f.contentid) !== String(item.contentid))
+        : [...favorites, {
+            contentid: item.contentid,
+            contenttypeid: item.contenttypeid || "",
+            title: item.title || "관광지명 없음",
+            addr1: item.addr1 || "",
+            firstimage: item.firstimage || item.firstimage2 || ""
+          }];
+
+      localStorage.setItem("travelFavorites", JSON.stringify(updated));
+      if (currentMode === "favorites") {
+        renderCards(updated.map(f => ({ ...f })), false);
+      } else {
+        renderCards(allItems, false);
+      }
+    }
+
+    function renderCards(items, append = false) {
+      const grid = $("cardGrid");
+      if (!append) grid.innerHTML = "";
+      $("status").classList.add("hidden");
+      grid.classList.remove("hidden");
+
+      if (!items.length && !append) {
+        setStatus("검색 결과가 없습니다.", "다른 지역이나 검색어를 입력해 보세요.");
+        $("resultCount").textContent = "0개";
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement("article");
+        card.className = "card";
+
+        const imageWrap = document.createElement("div");
+        imageWrap.className = "image-wrap";
+        const imageUrl = safeImageUrl(item.firstimage || item.firstimage2);
+
+        if (imageUrl) {
+          const img = document.createElement("img");
+          img.className = "card-img";
+          img.src = imageUrl;
+          img.alt = item.title || "관광지 사진";
+          img.loading = "lazy";
+          img.onerror = () => {
+            img.remove();
+            const noPhoto = document.createElement("div");
+            noPhoto.className = "no-photo";
+            noPhoto.textContent = "등록된 대표 사진이 없습니다.";
+            imageWrap.insertBefore(noPhoto, imageWrap.firstChild);
+          };
+          imageWrap.appendChild(img);
+        } else {
+          const noPhoto = document.createElement("div");
+          noPhoto.className = "no-photo";
+          noPhoto.textContent = "등록된 대표 사진이 없습니다.";
+          imageWrap.appendChild(noPhoto);
+        }
+
+        const fav = document.createElement("button");
+        fav.className = `favorite${isFavorite(item) ? " active" : ""}`;
+        fav.textContent = isFavorite(item) ? "♥" : "♡";
+        fav.setAttribute("aria-label", "즐겨찾기");
+        fav.addEventListener("click", () => toggleFavorite(item));
+        imageWrap.appendChild(fav);
+
+        const body = document.createElement("div");
+        body.className = "card-body";
+
+        const tag = document.createElement("span");
+        tag.className = "tag";
+        tag.textContent = item.contenttypeid === "12" ? "관광지" :
+          item.contenttypeid === "14" ? "문화시설" :
+          item.contenttypeid === "15" ? "축제·공연" :
+          item.contenttypeid === "28" ? "레포츠" :
+          item.contenttypeid === "32" ? "숙박" :
+          item.contenttypeid === "39" ? "음식점" : "여행 정보";
+
+        const title = document.createElement("h3");
+        title.textContent = item.title || "관광지명 없음";
+
+        const address = document.createElement("p");
+        address.className = "address";
+        address.textContent = item.addr1 || item.addr2 || "주소 정보 없음";
+
+        const button = document.createElement("button");
+        button.className = "detail-btn";
+        button.textContent = "상세 정보 보기 →";
+        button.addEventListener("click", () => openDetail(item));
+
+        body.append(tag, title, address, button);
+        card.append(imageWrap, body);
+        grid.appendChild(card);
+      });
+    }
+
+    function openDetail(item) {
+      localStorage.setItem("selectedTravelPlace", JSON.stringify(item));
+      location.href = "detail.html";
+    }
+
+    async function loadMore() {
+      currentPage += 1;
+      await searchPlaces(false);
+    }
+
+    function showFavorites() {
+      currentMode = "favorites";
+      const favorites = getFavorites();
+      $("listTitle").textContent = "내 즐겨찾기";
+      $("resultCount").textContent = `${favorites.length}개`;
+      $("moreBtn").classList.add("hidden");
+      renderCards(favorites, false);
+      if (!favorites.length) setStatus("저장한 여행지가 없습니다.", "카드의 하트 버튼을 눌러 저장해 보세요.");
+    }
+
+    $("keywordInput").addEventListener("keydown", event => {
+      if (event.key === "Enter") searchPlaces();
     });
-  }
 
-  function searchPark() {
-    const keyword = document.getElementById('searchInput').value.trim();
-    fetchData(keyword);
-  }
-
-  function showStatus(msg) {
-    document.getElementById('statusMsg').innerText = msg;
-  }
-</script>
-
+    // 처음 열었을 때 전국 여행지 목록을 불러옵니다.
+    searchPlaces();
+  </script>
 </body>
 </html>
