@@ -1,143 +1,386 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>공원 상세 정보</title>
+  <title>여행지 상세 정보 | TRAVEL LOG</title>
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
+    * { box-sizing: border-box; }
     body {
-      background-color: #f4f6f9;
-      margin: 0;
-      padding: 40px 20px;
-      display: flex;
-      justify-content: center;
+      margin: 0; background: #F4F6FA; color: #202C3D;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+        "Noto Sans KR", Arial, sans-serif;
     }
-    .detail-container {
-      width: 100%;
-      max-width: 600px;
-      background: #ffffff;
-      border-radius: 20px;
-      padding: 36px 32px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    button { font: inherit; cursor: pointer; }
+    .topbar {
+      background: #172D4D; color: white; padding: 19px 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 15px;
     }
-    .back-btn {
-      display: inline-block;
-      text-decoration: none;
-      color: #64748b;
-      font-weight: 600;
-      margin-bottom: 20px;
+    .brand { font-size: 20px; font-weight: 800; letter-spacing: 1px; }
+    .back {
+      color: white; background: transparent; border: 1px solid #71839C;
+      padding: 10px 14px; border-radius: 9px;
     }
-    h1 {
-      font-size: 24px;
-      color: #1e293b;
-      margin-top: 0;
-      margin-bottom: 24px;
+    main { max-width: 900px; margin: 35px auto; padding: 0 20px 50px; }
+    .panel {
+      background: white; border: 1px solid #E3E8F0;
+      border-radius: 18px; overflow: hidden;
     }
+    .hero-image {
+      width: 100%; height: 390px; object-fit: cover; display: block;
+      background: #E9EDF3;
+    }
+    .no-photo {
+      height: 240px; display: flex; align-items: center;
+      justify-content: center; text-align: center; padding: 20px;
+      color: #748094; background: #E9EDF3;
+    }
+    .content { padding: 28px; }
+    .tag {
+      display: inline-block; padding: 6px 9px; border-radius: 6px;
+      background: #EAF0F8; color: #36577F; font-size: 12px;
+    }
+    h1 { margin: 13px 0; font-size: clamp(26px, 5vw, 36px); line-height: 1.4; }
+    .address { color: #748094; line-height: 1.7; overflow-wrap: anywhere; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 22px 0 30px; }
+    .btn {
+      border: 0; border-radius: 9px; padding: 12px 17px; font-weight: 700;
+    }
+    .primary { background: #172D4D; color: white; }
+    .secondary { background: #EAF0F8; color: #172D4D; }
+    h2 { font-size: 19px; margin: 28px 0 12px; }
+    .overview { line-height: 1.9; color: #475569; white-space: pre-line; }
     .info-row {
-      display: flex;
-      flex-direction: column;
-      padding: 12px 0;
-      border-bottom: 1px solid #f1f5f9;
+      display: grid; grid-template-columns: 125px 1fr; gap: 12px;
+      padding: 14px 0; border-bottom: 1px solid #EDF0F5; line-height: 1.7;
     }
-    .info-label {
-      font-size: 13px;
-      color: #64748b;
-      font-weight: 600;
-      margin-bottom: 4px;
+    .info-label { color: #748094; font-size: 14px; }
+    .info-value { overflow-wrap: anywhere; }
+    .gallery {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
     }
-    .info-value {
-      font-size: 16px;
-      color: #1e293b;
-      font-weight: 500;
+    .gallery img {
+      width: 100%; height: 150px; object-fit: cover;
+      border-radius: 10px; background: #E9EDF3;
     }
-    .fav-btn {
-      width: 100%;
-      padding: 14px;
-      background-color: #ef4444;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 28px;
-      transition: background 0.2s;
+    .message {
+      padding: 35px 20px; text-align: center; color: #748094;
+      background: white; border-radius: 15px; line-height: 1.8;
     }
-    .fav-btn:hover {
-      background-color: #dc2626;
+    .hidden { display: none !important; }
+    footer { text-align: center; padding: 20px; color: #748094; font-size: 12px; }
+    @media (max-width: 600px) {
+      main { margin-top: 20px; padding: 0 12px 30px; }
+      .hero-image { height: 250px; }
+      .content { padding: 20px; }
+      .info-row { grid-template-columns: 95px 1fr; }
+      .gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
 </head>
 <body>
+  <header class="topbar">
+    <div class="brand">TRAVEL LOG</div>
+    <button class="back" onclick="goBack()">← 목록으로</button>
+  </header>
 
-<div class="detail-container">
-  <a href="index.html" class="back-btn">← 목록으로 돌아가기</a>
-  <h1 id="parkTitle">공원 이름</h1>
+  <main>
+    <div id="message" class="message">관광지 정보를 확인하는 중입니다...</div>
 
-  <div class="info-row">
-    <span class="info-label">공원 구분</span>
-    <span class="info-value" id="parkSe">-</span>
-  </div>
-  <div class="info-row">
-    <span class="info-label">소재지 주소</span>
-    <span class="info-value" id="parkAddr">-</span>
-  </div>
-  <div class="info-row">
-    <span class="info-label">운동 시설</span>
-    <span class="info-value" id="mvtFclty">-</span>
-  </div>
-  <div class="info-row">
-    <span class="info-label">편의 시설</span>
-    <span class="info-value" id="cnvncFclty">-</span>
-  </div>
-  <div class="info-row">
-    <span class="info-label">관리 기관</span>
-    <span class="info-value" id="mngInstNm">-</span>
-  </div>
+    <article id="detailPanel" class="panel hidden">
+      <div id="imageArea"></div>
+      <div class="content">
+        <span id="typeTag" class="tag">여행 정보</span>
+        <h1 id="placeTitle"></h1>
+        <div id="placeAddress" class="address"></div>
 
-  <button class="fav-btn" onclick="addFavorite()">❤️ 내 즐겨찾기에 추가하기</button>
-</div>
+        <div class="actions">
+          <button id="favoriteBtn" class="btn primary">♡ 즐겨찾기 추가</button>
+          <button class="btn secondary" onclick="goBack()">목록으로 돌아가기</button>
+        </div>
 
-<script>
-  let currentParkData = null;
+        <section>
+          <h2>여행지 소개</h2>
+          <div id="overview" class="overview">상세 설명을 불러오는 중입니다.</div>
+        </section>
 
-  window.onload = function() {
-    const data = localStorage.getItem('selectedPark');
-    if (!data) {
-      alert('선택된 공원 정보가 없습니다.');
-      window.location.href = 'index.html';
-      return;
+        <section>
+          <h2>기본 정보</h2>
+          <div class="info-row">
+            <div class="info-label">주소</div>
+            <div id="infoAddress" class="info-value">정보 없음</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">전화번호</div>
+            <div id="infoTel" class="info-value">정보 없음</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">홈페이지</div>
+            <div id="infoHomepage" class="info-value">정보 없음</div>
+          </div>
+        </section>
+
+        <section id="gallerySection" class="hidden">
+          <h2>여행지 사진</h2>
+          <div id="gallery" class="gallery"></div>
+        </section>
+      </div>
+    </article>
+  </main>
+
+  <footer>TRAVEL LOG · 한국관광공사 관광정보 활용</footer>
+
+  <script>
+    // index.html과 동일한 공공데이터포털 인증키를 입력하세요.
+    const TOUR_API_KEY = "여기에_기존_인증키_입력";
+    const API_BASE = "https://apis.data.go.kr/B551011/KorService2";
+
+    const $ = id => document.getElementById(id);
+    let place = null;
+
+    function safeImageUrl(value) {
+      if (!value) return "";
+      try {
+        const url = new URL(value);
+        if (url.protocol === "http:") url.protocol = "https:";
+        return url.protocol === "https:" ? url.href : "";
+      } catch {
+        return "";
+      }
     }
 
-    currentParkData = JSON.parse(data);
-
-    document.getElementById('parkTitle').innerText = currentParkData.parkNm || '정보 없음';
-    document.getElementById('parkSe').innerText = currentParkData.parkSe || '도시공원';
-    document.getElementById('parkAddr').innerText = currentParkData.lnmadr || currentParkData.rdnmadr || '주소 정보 없음';
-    document.getElementById('mvtFclty').innerText = currentParkData.mvtFclty || '운동시설 정보 없음';
-    document.getElementById('cnvncFclty').innerText = currentParkData.cnvncFclty || '편의시설 정보 없음';
-    document.getElementById('mngInstNm').innerText = currentParkData.mngInstNm || '관련 기관 정보 없음';
-  };
-
-  function addFavorite() {
-    if (!currentParkData) return;
-
-    let favorites = JSON.parse(localStorage.getItem('myParkFavs') || '[]');
-    
-    const exists = favorites.some(item => item.parkNm === currentParkData.parkNm);
-    if (exists) {
-      alert('이미 즐겨찾기에 등록된 공원입니다!');
-    } else {
-      favorites.push(currentParkData);
-      localStorage.setItem('myParkFavs', JSON.stringify(favorites));
-      alert('즐겨찾기에 성공적으로 등록되었습니다!');
+    function getFavorites() {
+      try {
+        return JSON.parse(localStorage.getItem("travelFavorites") || "[]");
+      } catch {
+        return [];
+      }
     }
-  }
-</script>
 
+    function isFavorite() {
+      return getFavorites().some(f => String(f.contentid) === String(place.contentid));
+    }
+
+    function updateFavoriteButton() {
+      $("favoriteBtn").textContent = isFavorite()
+        ? "♥ 즐겨찾기 해제"
+        : "♡ 즐겨찾기 추가";
+    }
+
+    function toggleFavorite() {
+      const favorites = getFavorites();
+      const exists = favorites.some(f => String(f.contentid) === String(place.contentid));
+
+      const updated = exists
+        ? favorites.filter(f => String(f.contentid) !== String(place.contentid))
+        : [...favorites, {
+            contentid: place.contentid,
+            contenttypeid: place.contenttypeid || "",
+            title: place.title || "관광지명 없음",
+            addr1: place.addr1 || "",
+            firstimage: place.firstimage || place.firstimage2 || ""
+          }];
+
+      localStorage.setItem("travelFavorites", JSON.stringify(updated));
+      updateFavoriteButton();
+      alert(exists ? "즐겨찾기에서 삭제했습니다." : "즐겨찾기에 저장했습니다.");
+    }
+
+    function goBack() {
+      location.href = "index.html";
+    }
+
+    function getItems(data) {
+      const items = data?.response?.body?.items?.item;
+      if (!items) return [];
+      return Array.isArray(items) ? items : [items];
+    }
+
+    async function apiRequest(endpoint, params) {
+      if (!TOUR_API_KEY || TOUR_API_KEY.includes("여기에_")) {
+        throw new Error("detail.html에 공공데이터포털 인증키를 입력해 주세요.");
+      }
+
+      const url = new URL(`${API_BASE}/${endpoint}`);
+      const values = {
+        serviceKey: TOUR_API_KEY,
+        MobileOS: "ETC",
+        MobileApp: "TravelLog",
+        _type: "json",
+        ...params
+      };
+
+      Object.entries(values).forEach(([key, value]) => {
+        if (value !== "" && value != null) url.searchParams.set(key, value);
+      });
+
+      const response = await fetch(url.toString());
+      if (!response.ok) throw new Error(`API HTTP 오류 (${response.status})`);
+      const data = await response.json();
+
+      const header = data?.response?.header;
+      if (header?.resultCode && header.resultCode !== "0000") {
+        throw new Error(header.resultMsg || "API 응답 오류");
+      }
+      return data;
+    }
+
+    function setText(id, value, fallback = "정보 없음") {
+      $(id).textContent = value || fallback;
+    }
+
+    function setHomepage(value) {
+      const container = $("infoHomepage");
+      container.textContent = "";
+
+      if (!value) {
+        container.textContent = "정보 없음";
+        return;
+      }
+
+      const match = value.match(/https?:\/\/[^\s"'<>]+/i);
+      if (!match) {
+        container.textContent = value.replace(/<[^>]*>/g, "");
+        return;
+      }
+
+      const link = document.createElement("a");
+      link.href = match[0];
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "공식 홈페이지 열기";
+      container.appendChild(link);
+    }
+
+    function renderGallery(items) {
+      const gallery = $("gallery");
+      gallery.innerHTML = "";
+
+      const urls = [...new Set(items.map(item => safeImageUrl(item.originimgurl || item.smallimageurl)).filter(Boolean))];
+
+      if (!urls.length) {
+        $("gallerySection").classList.add("hidden");
+        return;
+      }
+
+      urls.slice(0, 9).forEach(url => {
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = `${place.title || "관광지"} 사진`;
+        img.loading = "lazy";
+        img.onerror = () => img.remove();
+        gallery.appendChild(img);
+      });
+
+      $("gallerySection").classList.remove("hidden");
+    }
+
+    async function initDetail() {
+      try {
+        const raw = localStorage.getItem("selectedTravelPlace");
+        if (!raw) {
+          $("message").textContent = "선택한 여행지 정보가 없습니다. 목록으로 돌아가 다시 선택해 주세요.";
+          return;
+        }
+
+        place = JSON.parse(raw);
+        if (!place.contentid) {
+          $("message").textContent = "관광지 식별 정보가 없습니다. 목록에서 다시 선택해 주세요.";
+          return;
+        }
+
+        $("placeTitle").textContent = place.title || "관광지명 없음";
+        $("placeAddress").textContent = place.addr1 || place.addr2 || "주소 정보 없음";
+        setText("infoAddress", place.addr1 || place.addr2);
+        updateFavoriteButton();
+        $("favoriteBtn").addEventListener("click", toggleFavorite);
+
+        const imageUrl = safeImageUrl(place.firstimage || place.firstimage2);
+        if (imageUrl) {
+          const img = document.createElement("img");
+          img.className = "hero-image";
+          img.src = imageUrl;
+          img.alt = place.title || "관광지 사진";
+          img.onerror = () => {
+            img.remove();
+            const noPhoto = document.createElement("div");
+            noPhoto.className = "no-photo";
+            noPhoto.textContent = "등록된 대표 사진이 없습니다.";
+            $("imageArea").appendChild(noPhoto);
+          };
+          $("imageArea").appendChild(img);
+        } else {
+          const noPhoto = document.createElement("div");
+          noPhoto.className = "no-photo";
+          noPhoto.textContent = "등록된 대표 사진이 없습니다.";
+          $("imageArea").appendChild(noPhoto);
+        }
+
+        $("detailPanel").classList.remove("hidden");
+        $("message").classList.add("hidden");
+
+        try {
+          const data = await apiRequest("detailCommon2", {
+            contentId: place.contentid,
+            defaultYN: "Y",
+            firstImageYN: "Y",
+            areacodeYN: "Y",
+            catcodeYN: "Y",
+            addrinfoYN: "Y",
+            mapinfoYN: "Y",
+            overviewYN: "Y"
+          });
+
+          const details = getItems(data)[0];
+          if (details) {
+            setText("overview", details.overview, "등록된 상세 설명이 없습니다.");
+            setText("infoAddress", details.addr1 || details.addr2);
+            setText("infoTel", details.tel);
+            setHomepage(details.homepage);
+
+            if (details.firstimage && !place.firstimage) {
+              const imageUrl = safeImageUrl(details.firstimage);
+              if (imageUrl) {
+                const img = document.createElement("img");
+                img.className = "hero-image";
+                img.src = imageUrl;
+                img.alt = place.title || "관광지 사진";
+                img.onerror = () => img.remove();
+                $("imageArea").replaceChildren(img);
+              }
+            }
+          } else {
+            $("overview").textContent = "등록된 상세 설명이 없습니다.";
+            setHomepage("");
+          }
+        } catch (error) {
+          console.error("상세정보 조회 실패:", error);
+          $("overview").textContent =
+            "상세 설명을 불러오지 못했습니다. 기본 관광지 정보는 위에서 확인할 수 있습니다.";
+          setHomepage("");
+        }
+
+        try {
+          const imageData = await apiRequest("detailImage2", {
+            contentId: place.contentid,
+            imageYN: "Y",
+            subImageYN: "Y"
+          });
+          renderGallery(getItems(imageData));
+        } catch (error) {
+          console.warn("추가 이미지 조회 실패:", error);
+          $("gallerySection").classList.add("hidden");
+        }
+      } catch (error) {
+        console.error(error);
+        $("message").textContent = error.message || "관광지 정보를 표시하지 못했습니다.";
+      }
+    }
+
+    initDetail();
+  </script>
 </body>
 </html>
