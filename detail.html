@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>공원 상세 정보</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .detail-container {
+      width: 100%;
+      max-width: 600px;
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 36px 32px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    }
+    .back-btn {
+      display: inline-block;
+      text-decoration: none;
+      color: #64748b;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 24px;
+      color: #1e293b;
+      margin-top: 0;
+      margin-bottom: 24px;
+    }
+    .info-row {
+      display: flex;
+      flex-direction: column;
+      padding: 12px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .info-label {
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .info-value {
+      font-size: 16px;
+      color: #1e293b;
+      font-weight: 500;
+    }
+    .fav-btn {
+      width: 100%;
+      padding: 14px;
+      background-color: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 28px;
+      transition: background 0.2s;
+    }
+    .fav-btn:hover {
+      background-color: #dc2626;
+    }
+  </style>
+</head>
+<body>
+
+<div class="detail-container">
+  <a href="index.html" class="back-btn">← 목록으로 돌아가기</a>
+  <h1 id="parkTitle">공원 이름</h1>
+
+  <div class="info-row">
+    <span class="info-label">공원 구분</span>
+    <span class="info-value" id="parkSe">-</span>
+  </div>
+  <div class="info-row">
+    <span class="info-label">소재지 주소</span>
+    <span class="info-value" id="parkAddr">-</span>
+  </div>
+  <div class="info-row">
+    <span class="info-label">운동 시설</span>
+    <span class="info-value" id="mvtFclty">-</span>
+  </div>
+  <div class="info-row">
+    <span class="info-label">편의 시설</span>
+    <span class="info-value" id="cnvncFclty">-</span>
+  </div>
+  <div class="info-row">
+    <span class="info-label">관리 기관</span>
+    <span class="info-value" id="mngInstNm">-</span>
+  </div>
+
+  <button class="fav-btn" onclick="addFavorite()">❤️ 내 즐겨찾기에 추가하기</button>
+</div>
+
+<script>
+  let currentParkData = null;
+
+  window.onload = function() {
+    const data = localStorage.getItem('selectedPark');
+    if (!data) {
+      alert('선택된 공원 정보가 없습니다.');
+      window.location.href = 'index.html';
+      return;
+    }
+
+    currentParkData = JSON.parse(data);
+
+    document.getElementById('parkTitle').innerText = currentParkData.parkNm || '정보 없음';
+    document.getElementById('parkSe').innerText = currentParkData.parkSe || '도시공원';
+    document.getElementById('parkAddr').innerText = currentParkData.lnmadr || currentParkData.rdnmadr || '주소 정보 없음';
+    document.getElementById('mvtFclty').innerText = currentParkData.mvtFclty || '운동시설 정보 없음';
+    document.getElementById('cnvncFclty').innerText = currentParkData.cnvncFclty || '편의시설 정보 없음';
+    document.getElementById('mngInstNm').innerText = currentParkData.mngInstNm || '관련 기관 정보 없음';
+  };
+
+  function addFavorite() {
+    if (!currentParkData) return;
+
+    let favorites = JSON.parse(localStorage.getItem('myParkFavs') || '[]');
+    
+    const exists = favorites.some(item => item.parkNm === currentParkData.parkNm);
+    if (exists) {
+      alert('이미 즐겨찾기에 등록된 공원입니다!');
+    } else {
+      favorites.push(currentParkData);
+      localStorage.setItem('myParkFavs', JSON.stringify(favorites));
+      alert('즐겨찾기에 성공적으로 등록되었습니다!');
+    }
+  }
+</script>
+
+</body>
+</html>
